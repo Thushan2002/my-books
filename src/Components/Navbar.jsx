@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { BookOpenIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import FloatingParticle from "./FloatingParticle";
 
 const Navbar = () => {
   const [isHovered, setIsHovered] = useState(false);
@@ -100,6 +101,7 @@ const Navbar = () => {
           </div>
         </div>
       </div>
+      <FloatingParticle/>
     </nav>
   );
 };
