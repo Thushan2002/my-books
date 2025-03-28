@@ -1,3 +1,4 @@
+import { StarIcon } from "@heroicons/react/16/solid";
 import { motion } from "framer-motion";
 import React, { useEffect, useState } from "react";
 
@@ -12,6 +13,10 @@ const Hero = ({ searchQuery }) => {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
+  const generatePageNumber = () => {
+    return Array.from({ length: totalPages }, (_, i) => i + 1);
+  };
 
   useEffect(() => {
     const fetchBooks = async () => {
@@ -121,7 +126,7 @@ const Hero = ({ searchQuery }) => {
               <div
                 id="hero"
                 key={book.id}
-                className="group relative bg-gray-800/30 rounded-xl md:rounded-2xl backdrop-blur-xl border border-white/10 hover:border-cyan-400/30 transition-all duration-300 hover:-translate-y-1 md:hover:-translate-x-2 shadow-xl hover:shadow-2xl hover:shadow-cyan-400/10">
+                className="group relative bg-gray-800/30 rounded-xl md:rounded-2xl backdrop-blur-xl border border-white/10 hover:border-cyan-400/30 transition-all duration-300 hover:-translate-y-2  shadow-xl hover:shadow-2xl hover:shadow-cyan-400/10">
                 <a
                   href={book.infoLink}
                   target="_blank"
@@ -142,17 +147,120 @@ const Hero = ({ searchQuery }) => {
                       }
                     />
                   </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-transparent to-transparent">
+                  <div className="relative inset-0 bg-gradient-to-t from-gray-900/80 via-transparent to-transparent">
                     <div className="absolute bottom-0 left-0 right-0 p-2 md:p-4 bg-gradient-to-t from-gray-900/90 to-transparent">
                       <span className="text-xs md:text-sm font-medium text-cyan-300">
                         {book.printType}
                       </span>
                     </div>
                   </div>
+
+                  <div className="mt-4 md:mt-6">
+                    <h3 className="text-lg md:text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">
+                      {book.title}
+                    </h3>
+                    <p className="text-gray-400 mt-1 md:mt-2 text-sm md:text-base">
+                      {book.authors}
+                    </p>
+                    <div className="flex items-center mt-2 md:mt-3">
+                      <div className="flex text-amber-400">
+                        {[...Array(5)].map((_, i) => (
+                          <StarIcon
+                            key={i}
+                            className={`h-4 w-4 md:h-5 md:w-5 
+                              ${
+                                i < Math.floor(book.rating)
+                                  ? "fill-current"
+                                  : "fill-gray-600"
+                              }`}
+                          />
+                        ))}
+                      </div>
+                      <span className="ml-2 text-cyan-300 text-sm md:text-base">
+                        {book.rating}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 md:gap-4 md:mt-4 text-xs md:text-sm">
+                      <div className="flex items-center justify-center space-x-1 md:space-x-2">
+                        <span className="text-gray-400">Pages:</span>
+                        <span className="text-cyan-300">{book.pageCount}</span>
+                      </div>
+                      <div className="flex items-center justify-center space-x-1 md:space-x-2">
+                        <span className="text-gray-400">Format:</span>
+                        <span className="text-purple-300">
+                          {book.printType}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-center space-x-1 md:space-x-2">
+                        <span className="text-gray-400">Rating:</span>
+                        <span className="text-blue-300">
+                          {book.ratingsCount}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="mt-2 md:mt-4 flex flex-wrap gap-1 md:gap-2">
+                      {book.categories
+                        .split(",")
+                        .slice(0, 3)
+                        .map((category, index) => (
+                          <span
+                            key={index}
+                            className="px-2 py-1 md:px-3 md:py-1 rounded-full bg-gray-700/50 text-xs text-cyan-300 backdrop-blur-sm">
+                            {category.trim()}
+                            {index === 2 &&
+                              book.categories.split(",").length > 3 && (
+                                <span className="ml-1 text-gray-400">
+                                  +{book.categories.split(",").length - 3}
+                                </span>
+                              )}
+                          </span>
+                        ))}
+                    </div>
+                  </div>
                 </div>
+
+                <div className="absolute inset-0 rounded-xl md:rounded-2xl bg-gradient-to-br from-cyan-400/20 to-blue-500/20 opacity-0 group-hover:opacity-30 transition-opacity duration-300 pointer-events-none"></div>
               </div>
             );
           })}
+        </div>
+        <div className="mt-6 md:mt-8 flex flex-wrap items-center justify-center gap-2 md:gap-3">
+          <button
+            onClick={() => {
+              setCurrentPage((p) => {
+                Math.max(1, p - 1);
+              });
+            }}
+            disabled={currentPage === 1}
+            className="px-3 py-1 md:px-4 md:py-2 rounded-md md:rounded-lg bg-gray-900/80 border border-e-gray-700/50 text-cyan-300 text-xs md:text-sm hover:bg-gray-900/60 transition-colors disabled:opacity-50">
+            Previous
+          </button>
+          {generatePageNumber().map((page, index) => (
+            <button
+              key={index}
+              onClick={() => {
+                setCurrentPage(page);
+              }}
+              className={`px-3 py-1 md:px-4 md:py-2 rounded-md md:rounded-lg ${
+                page === currentPage
+                  ? "bg-cyan-400/30 text-cyan-300"
+                  : "bg-gray-900/80 border border-e-gray-700/50 text-cyan-300"
+              }  text-xs md:text-sm hover:bg-gray-900/60 transition-colors disabled:opacity-50`}>
+              {page}
+            </button>
+          ))}
+          <button
+            onClick={() => {
+              setCurrentPage((p) => {
+                Math.min(totalPages, p + 1);
+              });
+            }}
+            disabled={currentPage === totalPages}
+            className="px-3 py-1 md:px-4 md:py-2 rounded-md md:rounded-lg bg-gray-900/80 border border-e-gray-700/50 text-cyan-300 text-xs md:text-sm hover:bg-gray-900/60 transition-colors disabled:opacity-50">
+            Next
+          </button>
         </div>
       </div>
     </div>
